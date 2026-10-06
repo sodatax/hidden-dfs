@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.print.DocFlavor.INPUT_STREAM;
+
 public class Traverse {
   public static void main(String[] args) {
     // Create Person objects with empty confidant sets.
@@ -69,5 +71,43 @@ public class Traverse {
     v45.neighbors = new ArrayList<>(List.of(v23));
     v23.neighbors = new ArrayList<>(List.of());
     v67.neighbors = new ArrayList<>(List.of(v91));
+
+    // printGossipers(grace);
+    System.out.println(minReachable(graph, 78));
+  }
+
+  public static int minReachable(Map<Integer, Set<Integer>> graph, int start){
+    if(graph==null) throw new NullPointerException("Cannot find minimum of missing graph"); //could `return Integer.MAX_VALUE` in helper method instead
+    // Set<Integer> visited = new HashSet<>(); //<------- Can be put into 1 line as done below
+    return minReachable(graph, start, new HashSet<>());
+  }
+
+  private static int minReachable(Map<Integer, Set<Integer>> graph, int current, Set<Integer> visited){
+    if(visited.contains(current)) return Integer.MAX_VALUE;
+    visited.add(current);
+    int min = current;
+
+    for(int neighbor : graph.get(current)){
+      int minFromNeighbor = minReachable(graph, neighbor, visited);
+      if(minFromNeighbor < min) min = minFromNeighbor; //can use Math.min()
+    }
+
+    return min;
+  }
+
+  public static void printGossipers(Person initial){
+    Set<Person> visited = new HashSet<>();
+    printGossipers(initial, visited);
+  }
+
+  private static void printGossipers(Person current, Set<Person> visited){
+    if(current==null || visited.contains(current)) return;
+    visited.add(current);
+    System.out.println(current.getName());
+
+    for(Person confidant : current.getConfidants()){
+      printGossipers(confidant, visited);
+    }
+    
   }
 }
